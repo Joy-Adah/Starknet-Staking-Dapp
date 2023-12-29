@@ -18,9 +18,9 @@ trait IERC20<TContractState> {
         ref self: TContractState, spender: ContractAddress, subtracted_value: u256
     );
 
-    fn mint(ref self: TContractState, recipient: ContractAddress, amount: u256);
+    fn mint(ref self: TContractState, recipient: ContractAddress, amount: u256) -> bool;
 
-    fn burn(ref self: TContractState, amount: u256) -> bool;
+    fn burn(ref self: TContractState, to: ContractAddress, amount: u256) -> bool;
 }
 
 #[starknet::contract]
@@ -36,6 +36,7 @@ mod BWCERC20Token {
     #[storage]
     struct Storage {
         name: felt252,
+        owner: ContractAddress,
         symbol: felt252,
         decimals: u8,
         total_supply: u256,
@@ -125,16 +126,18 @@ mod BWCERC20Token {
         }
 
 
-        fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256) {
+        fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256) -> bool {
             let owner = self.owner.read();
             let caller = get_caller_address();
             assert(owner == caller, 'caller not owner');
             assert(!recipient.is_zero(), 'ERC20: Adddress zero');
-            assert(balances >= amount, 'Insufficient fund');
+            assert(self.balances.read(recipient) >= amount, 'Insufficient fund');
             self.balances.write(recipient, self.balances.read(recipient) + amount);
             self.total_supply.write(self.total_supply.read() - amount);
             // call tranfer 
-            Transfer(Zeroable::zero(), recipient, amount);
+            // Transfer(Zeroable::zero(), recipient, amount);
+
+            true
         }
 
         fn transfer(ref self: ContractState, recipient: ContractAddress, amount: u256) {
@@ -188,13 +191,13 @@ mod BWCERC20Token {
             let msg_sender = get_caller_address();
             assert(owner == msg_sender, 'msg_sender not owner');
 
-            assert(balances >= amount, 'Insufficient fund');
+            assert(self.balances.read(to) >= amount, 'Insufficient fund');
 
             self.balances.write(msg_sender, self.balances.read(msg_sender) - amount);
 
             // call transfer
 
-            Transfer(Zeroable::zero(), to, amount);
+            // Transfer(Zeroable::zero(), to, amount);
 
             true
         }
