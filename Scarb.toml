@@ -13,3 +13,7 @@ starknet = "2.4.0"
 sierra = true
 casm = true
 
+[tool.sncast.test_1]
+account = "test_1"
+accounts-file = "/Users/user/.starknet_accounts/starknet_open_zeppelin_accounts.json"
+url = "https://starknet-goerli.infura.io/v3/c61b0457e5004368ac942e464b8d1f62"
