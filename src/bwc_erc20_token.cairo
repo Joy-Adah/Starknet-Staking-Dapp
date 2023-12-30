@@ -73,6 +73,7 @@ mod BWCERC20Token {
     #[constructor]
     fn constructor(
         ref self: ContractState,
+        _owner: ContractAddress,
         _name: felt252,
         _symbol: felt252,
         _decimal: u8,
@@ -81,6 +82,8 @@ mod BWCERC20Token {
     ) {
         // The .is_zero() method here is used to determine whether the address type recipient is a 0 address, similar to recipient == address(0) in Solidity.
         assert(!recipient.is_zero(), 'transfer to zero address');
+        assert(!_owner.is_zero(), 'owner cant be zero addr');
+        self.owner.write(_owner);
         self.name.write(_name);
         self.symbol.write(_symbol);
         self.decimals.write(_decimal);
