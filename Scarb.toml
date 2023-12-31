@@ -7,13 +7,13 @@ edition = "2023_10"
 
 [dependencies]
 snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.13.0" }
-starknet = "2.4.0"
+starknet = "2.4.1"
 
 [[target.starknet-contract]]
 sierra = true
 casm = true
 
-[tool.sncast.test_1]
-account = "test_1"
+[tool.sncast.starknetTest]
+account = "starknetTest"
 accounts-file = "/Users/user/.starknet_accounts/starknet_open_zeppelin_accounts.json"
 url = "https://starknet-goerli.infura.io/v3/c61b0457e5004368ac942e464b8d1f62"
