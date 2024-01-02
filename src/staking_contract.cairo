@@ -10,8 +10,8 @@ use starknet::ContractAddress;
 #[starknet::interface]
 trait StakingTokenTrait<ContractState> {
     // fn depositBWC(ref self: TContractState, amount: u256) -> bool;
-    fn stakeBWCToken(ref self: TContractState, amount: u256, BWCERC20TokenAddr: ContractAddress);
-    fn withdrawBWCToken(ref self: TContractState, amount: u256, BWCERC20TokenAddr: ContractAddress);
+    fn stakeBWCToken(ref self: TContractState, amount: u256, BWCERC20TokenAddr: ContractAddress) -> bool;
+    fn withdrawBWCToken(ref self: TContractState, amount: u256, BWCERC20TokenAddr: ContractAddress) -> bool;
     fn getUserBalance(self: @TContractState) -> u256;
 // fn getStakeDetailsByAddress(self: @ContractState, account:ContractAddress) -> StakeDetail;
 }
@@ -53,7 +53,7 @@ mod StakingToken {
     //////////////////
     // CONSTANT
     //////////////////
-    const minStakeTime: u64 = 259200_u64;
+    const MIN_STAKE_TIME: u64 = 259200_u64;
 
 
     /////////////////
@@ -110,7 +110,7 @@ mod StakingToken {
             let mut stake: StakeDetail = self.staker.read(caller);
             if stake_status == true {
                 let day_spent = get_block_timestamp() - stake_time;
-                if day_spent > minStakeTime {
+                if day_spent > MIN_STAKE_TIME {
                     let reward = self.calculateReward(caller);
                     stake.amount += reward;
                     stake.amount -= amount;
@@ -141,7 +141,7 @@ mod StakingToken {
             let day_spent = get_block_timestamp() - stake_time;
             let mut stake: StakeDetail = self.staker.read(caller);
             assert(amount <= stake_amount, 'Insufficient fund');
-            if day_spent > minStakeTime {
+            if day_spent > MIN_STAKE_TIME {
                 let reward = self.calculateReward(caller);
                 stake.amount += reward;
                 stake.amount -= amount;
@@ -188,7 +188,7 @@ mod StakingToken {
             }
             let reward_per_month = (stake_amount * 10);
             let time = get_block_timestamp() - stake_time;
-            let reward = (reward_per_month * time.into() * 1000) / minStakeTime.into();
+            let reward = (reward_per_month * time.into() * 1000) / MIN_STAKE_TIME.into();
             return reward;
         }
     }
